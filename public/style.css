@@ -1,70 +1,142 @@
-/* RESET */
-* {
-    box-sizing: border-box;
-}
-
-/* BODY */
+/* Corps de la page */
 body {
     margin: 0;
-    font-family: "Segoe UI", system-ui, sans-serif;
-    background: linear-gradient(270deg, #667eea, #764ba2, #4f46e5);
-    background-size: 600% 600%;
-    animation: bgMove 15s ease infinite;
-    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2, #f59e0b, #10b981);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
 }
 
-@keyframes bgMove {
+/* Animation du fond */
+@keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* CHAT CONTAINER */
+/* Conteneur du chat */
 .chat {
-    background: #fff;
-    width: 420px;
+    background: rgba(255,255,255,0.95);
+    width: 450px;
+    max-width: 95%;
     height: 650px;
-    border-radius: 18px;
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    border: 2px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s;
 }
 
-/* HEADER */
+.chat:hover { transform: scale(1.02); }
+
+/* Header */
 .chat h1 {
     margin: 0;
-    padding: 16px;
-    text-align: center;
+    padding: 18px;
+    background: linear-gradient(90deg, #4f46e5, #4338ca, #f59e0b, #10b981);
+    background-size: 300% 300%;
+    animation: gradientText 10s ease infinite;
     color: white;
-    background: linear-gradient(135deg, #4f46e5, #4338ca);
-    position: relative;
+    text-align: center;
+    font-size: 1.6em;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-#mainMenuBtn {
-    position: absolute;
-    right: 16px;
-    top: 14px;
-    background: none;
+@keyframes gradientText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Messages */
+#messages {
+    flex: 1;
+    padding: 15px;
+    background: rgba(243,244,246,0.8);
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Messages communs */
+.message {
+    padding: 12px 18px;
+    border-radius: 25px;
+    max-width: 75%;
+    word-wrap: break-word;
+    font-size: 16px;
+    line-height: 1.5;
+    position: relative;
+    transition: transform 0.1s, box-shadow 0.2s, background 0.5s;
+}
+
+.message:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+/* Messages gauche / droite */
+.message.gauche { text-align: left; align-self: flex-start; color: white; }
+.message.droite { text-align: right; align-self: flex-end; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; }
+
+/* Zone d’input */
+.input-zone {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #ddd;
+    background: rgba(245,245,245,0.9);
+    position: sticky;
+    bottom: 0;
+    backdrop-filter: blur(5px);
+}
+
+.input-zone input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 30px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-zone input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 10px rgba(79,70,229,0.3);
+}
+
+.input-zone button {
+    margin-left: 10px;
+    padding: 12px 20px;
     border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #4f46e5, #4338ca, #f59e0b, #10b981);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     color: white;
-    font-size: 22px;
+    font-weight: bold;
     cursor: pointer;
 }
 
-/* MENU */
+/* Menu */
 .main-menu {
     display: none;
     position: absolute;
     top: 60px;
-    right: 15px;
-    background: white;
+    right: 20px;
+    background: rgba(255,255,255,0.95);
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     flex-direction: column;
+    min-width: 180px;
     z-index: 100;
 }
 
@@ -72,127 +144,16 @@ body {
     padding: 12px;
     border: none;
     background: none;
-    cursor: pointer;
     text-align: left;
-}
-
-.main-menu button:hover {
-    background: #f0f0f0;
-}
-
-/* MESSAGES */
-#messages {
-    flex: 1;
-    padding: 15px;
-    background: #f3f4f6;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-}
-
-/* MESSAGE */
-.message {
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 20px;
-    animation: msgIn 0.25s ease;
-    word-wrap: break-word;
-}
-
-@keyframes msgIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.message.gauche {
-    align-self: flex-start;
-    background: linear-gradient(135deg, #10b981, #4ade80);
-    color: white;
-}
-
-.message.droite {
-    align-self: flex-end;
-    background: linear-gradient(135deg, #4f46e5, #4338ca);
-    color: white;
-}
-
-/* INPUT ZONE */
-.input-zone {
-    display: flex;
-    padding: 10px;
-    background: #f9fafb;
-    border-top: 1px solid #ddd;
-}
-
-.input-zone input {
-    flex: 1;
-    padding: 14px;
-    font-size: 16px;
-    border-radius: 25px;
-    border: 1px solid #ccc;
-    outline: none;
-}
-
-.input-zone button {
-    margin-left: 10px;
-    padding: 14px 22px;
-    border-radius: 25px;
-    border: none;
-    background: linear-gradient(135deg, #4f46e5, #4338ca);
-    color: white;
-    font-weight: bold;
+    width: 100%;
     cursor: pointer;
+    font-size: 14px;
 }
 
-.input-zone button:active {
-    transform: scale(0.95);
-}
-
-/* 📱 MOBILE OPTIMISATION */
+/* Responsive mobile */
 @media (max-width: 500px) {
-    body {
-        align-items: stretch;
-    }
-
-    .chat {
-        width: 100%;
-        height: 100vh;
-        border-radius: 0;
-    }
-
-    .message {
-        font-size: 16px;
-        max-width: 90%;
-    }
-
-    .input-zone input,
-    .input-zone button {
-        font-size: 17px;
-    }
-
-    #mainMenuBtn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #4f46e5;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
-
-    .main-menu {
-        top: auto;
-        bottom: 80px;
-        right: 20px;
-    }
+    .chat { width: 100%; height: 90vh; border-radius: 0; margin: 0; }
+    #messages { padding: 10px; }
+    .input-zone input, .input-zone button { font-size: 16px; padding: 12px; }
+    .message img { max-width: 80%; border-radius: 12px; }
 }
