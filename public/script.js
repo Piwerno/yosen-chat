@@ -1,100 +1,65 @@
-let pseudoUtilisateur = localStorage.getItem("pseudo") || "";
+let pseudoUtilisateur = "";
 const socket = io();
+const notifSound = new Audio("notif.mp3");
 
-// Couleurs par pseudo
-const colors = {};
-const palette = [
-    "linear-gradient(135deg, #f97316, #facc15)",
-    "linear-gradient(135deg, #4ade80, #22c55e)",
-    "linear-gradient(135deg, #3b82f6, #6366f1)",
-    "linear-gradient(135deg, #ec4899, #f43f5e)",
-    "linear-gradient(135deg, #8b5cf6, #a78bfa)"
-];
-
-function getPseudoColor(pseudo) {
-    if (!colors[pseudo]) {
-        colors[pseudo] = palette[Math.floor(Math.random() * palette.length)];
-    }
-    return colors[pseudo];
+// Demande autorisation notification
+if ("Notification" in window && Notification.permission !== "granted") {
+    Notification.requestPermission();
 }
 
-// Affichage des messages
-function afficherMessage({ pseudo, texte, image, heure }) {
+function afficherMessage({ pseudo, texte, heure }) {
     const messages = document.getElementById("messages");
     const div = document.createElement("div");
-    div.className = "message";
 
-    if (pseudo === pseudoUtilisateur) {
-        div.classList.add("droite");
-    } else {
-        div.classList.add("gauche");
-        if (!image) div.style.background = getPseudoColor(pseudo);
+    const isMe = pseudo === pseudoUtilisateur;
+    div.className = "message " + (isMe ? "droite" : "gauche");
+
+    div.innerHTML = `<strong>${pseudo}</strong> <small>${heure}</small><br>${texte}`;
+
+    if (!isMe) {
+        div.classList.add("notif");
+        notifSound.play().catch(()=>{});
+
+        if (document.hidden && Notification.permission === "granted") {
+            new Notification("💬 Nouveau message", {
+                body: `${pseudo} : ${texte}`
+            });
+        }
     }
 
-    let content = `<strong style="background: ${getPseudoColor(pseudo)}; -webkit-background-clip: text; color: transparent;">${pseudo}</strong> <small>(${heure})</small><br>`;
-    if (texte) content += texte;
-    if (image) content += `<br><img src="${image}" style="max-width:200px; border-radius:12px;">`;
-
-    div.innerHTML = content;
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
 }
 
-// Envoyer un message texte
 function envoyerMessage() {
-    if (!pseudoUtilisateur) {
-        pseudoUtilisateur = prompt("Quel est ton pseudo ?") || "Invité";
-        localStorage.setItem("pseudo", pseudoUtilisateur);
-    }
-
+    const pseudo = document.getElementById("pseudoInput").value.trim();
     const texte = document.getElementById("messageInput").value.trim();
-    if (!texte) return;
+    if (!pseudo || !texte) return;
 
-    const now = new Date();
-    const heure = now.getHours().toString().padStart(2,"0") + ":" +
-                  now.getMinutes().toString().padStart(2,"0");
-
-    socket.emit("message", { pseudo: pseudoUtilisateur, texte, image: null, heure });
+    pseudoUtilisateur = pseudo;
+    socket.emit("message", { pseudo, texte });
     document.getElementById("messageInput").value = "";
 }
 
-// Envoyer une photo
-const imageInput = document.getElementById("imageInput");
-imageInput.addEventListener("change", () => {
-    const file = imageInput.files[0];
-    if (!file) return;
+socket.on("message", afficherMessage);
 
-    const reader = new FileReader();
-    reader.onload = () => {
-        const now = new Date();
-        const heure = now.getHours().toString().padStart(2,"0") + ":" +
-                      now.getMinutes().toString().padStart(2,"0");
-
-        socket.emit("message", {
-            pseudo: pseudoUtilisateur,
-            texte: null,
-            image: reader.result,
-            heure
-        });
-    };
-    reader.readAsDataURL(file);
-    imageInput.value = "";
+socket.on("messageHistory", history => {
+    history.forEach(afficherMessage);
 });
 
-// Socket.io
-socket.on("message", msg => afficherMessage(msg));
-
-// Enter pour envoyer message
 document.getElementById("messageInput").addEventListener("keypress", e => {
     if (e.key === "Enter") envoyerMessage();
 });
 
-// Menu
 document.getElementById("mainMenuBtn").onclick = () => {
     const menu = document.getElementById("mainMenu");
-    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
 };
 
-function supprimerTousMessages() { document.getElementById("messages").innerHTML = ""; }
-function changerTheme() { document.body.classList.toggle("dark"); }
-function afficherAide() { alert("💬 Chat temps réel Node.js\nCréé par toi 😎"); }
+function supprimerTousMessages() {
+    document.getElementById("messages").innerHTML = "";
+}
+
+function afficherAide() {
+    alert("💬 Chat temps réel\nNotifications activées 🔔");
+}
