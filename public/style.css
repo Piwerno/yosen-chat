@@ -20,7 +20,7 @@ body {
 
 /* Conteneur du chat */
 .chat {
-    background: rgba(255,255,255,0.95);
+    background: rgba(79, 255, 117, 0.95);
     width: 450px;
     max-width: 95%;
     height: 650px;
@@ -43,7 +43,7 @@ body {
     background: linear-gradient(90deg, #4f46e5, #4338ca, #f59e0b, #10b981);
     background-size: 300% 300%;
     animation: gradientText 10s ease infinite;
-    color: white;
+    color: rgb(79, 248, 206);
     text-align: center;
     font-size: 1.6em;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
