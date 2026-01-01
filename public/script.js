@@ -1,16 +1,24 @@
 let pseudoUtilisateur = localStorage.getItem("pseudo") || "";
 const socket = io();
 
+// Couleurs par pseudo
 const colors = {};
-const palette = ["#4f46e5", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6"];
+const palette = [
+    "linear-gradient(135deg, #f97316, #facc15)",
+    "linear-gradient(135deg, #4ade80, #22c55e)",
+    "linear-gradient(135deg, #3b82f6, #6366f1)",
+    "linear-gradient(135deg, #ec4899, #f43f5e)",
+    "linear-gradient(135deg, #8b5cf6, #a78bfa)"
+];
 
-function getColor(pseudo) {
+function getPseudoColor(pseudo) {
     if (!colors[pseudo]) {
         colors[pseudo] = palette[Math.floor(Math.random() * palette.length)];
     }
     return colors[pseudo];
 }
 
+// Affichage des messages
 function afficherMessage({ pseudo, texte, image, heure }) {
     const messages = document.getElementById("messages");
     const div = document.createElement("div");
@@ -20,10 +28,10 @@ function afficherMessage({ pseudo, texte, image, heure }) {
         div.classList.add("droite");
     } else {
         div.classList.add("gauche");
-        if (!image) div.style.background = getColor(pseudo);
+        if (!image) div.style.background = getPseudoColor(pseudo);
     }
 
-    let content = `<strong>${pseudo}</strong> <small>(${heure})</small><br>`;
+    let content = `<strong style="background: ${getPseudoColor(pseudo)}; -webkit-background-clip: text; color: transparent;">${pseudo}</strong> <small>(${heure})</small><br>`;
     if (texte) content += texte;
     if (image) content += `<br><img src="${image}" style="max-width:200px; border-radius:12px;">`;
 
@@ -32,6 +40,7 @@ function afficherMessage({ pseudo, texte, image, heure }) {
     messages.scrollTop = messages.scrollHeight;
 }
 
+// Envoyer un message texte
 function envoyerMessage() {
     if (!pseudoUtilisateur) {
         pseudoUtilisateur = prompt("Quel est ton pseudo ?") || "Invité";
@@ -42,14 +51,14 @@ function envoyerMessage() {
     if (!texte) return;
 
     const now = new Date();
-    const heure = now.getHours().toString().padStart(2, "0") + ":" +
-                  now.getMinutes().toString().padStart(2, "0");
+    const heure = now.getHours().toString().padStart(2,"0") + ":" +
+                  now.getMinutes().toString().padStart(2,"0");
 
     socket.emit("message", { pseudo: pseudoUtilisateur, texte, image: null, heure });
     document.getElementById("messageInput").value = "";
 }
 
-// Envoi d'image
+// Envoyer une photo
 const imageInput = document.getElementById("imageInput");
 imageInput.addEventListener("change", () => {
     const file = imageInput.files[0];
@@ -58,8 +67,8 @@ imageInput.addEventListener("change", () => {
     const reader = new FileReader();
     reader.onload = () => {
         const now = new Date();
-        const heure = now.getHours().toString().padStart(2, "0") + ":" +
-                      now.getMinutes().toString().padStart(2, "0");
+        const heure = now.getHours().toString().padStart(2,"0") + ":" +
+                      now.getMinutes().toString().padStart(2,"0");
 
         socket.emit("message", {
             pseudo: pseudoUtilisateur,
@@ -86,14 +95,6 @@ document.getElementById("mainMenuBtn").onclick = () => {
     menu.style.display = menu.style.display === "flex" ? "none" : "flex";
 };
 
-function supprimerTousMessages() {
-    document.getElementById("messages").innerHTML = "";
-}
-
-function changerTheme() {
-    document.body.classList.toggle("dark");
-}
-
-function afficherAide() {
-    alert("💬 Chat temps réel Node.js\nCréé par toi 😎");
-}
+function supprimerTousMessages() { document.getElementById("messages").innerHTML = ""; }
+function changerTheme() { document.body.classList.toggle("dark"); }
+function afficherAide() { alert("💬 Chat temps réel Node.js\nCréé par toi 😎"); }
