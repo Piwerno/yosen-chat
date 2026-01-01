@@ -167,3 +167,18 @@ body {
 .message.new {
     animation: notifPulse 1s ease;
 }
+
+/* Messages gauche / droite */
+.message.droite {
+    text-align: right;
+    align-self: flex-end;
+    background: linear-gradient(135deg, #4f46e5, #4338ca);
+    color: white;
+}
+
+.message.gauche {
+    text-align: left;
+    align-self: flex-start;
+    background: linear-gradient(135deg, #10b981, #22c55e);
+    color: white;
+}
