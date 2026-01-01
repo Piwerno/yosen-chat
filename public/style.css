@@ -157,3 +157,13 @@ body {
     .input-zone input, .input-zone button { font-size: 16px; padding: 12px; }
     .message img { max-width: 80%; border-radius: 12px; }
 }
+
+@keyframes notifPulse {
+    0% { box-shadow: 0 0 0 rgba(0,0,0,0); }
+    50% { box-shadow: 0 0 15px rgba(255,215,0,0.7); }
+    100% { box-shadow: 0 0 0 rgba(0,0,0,0); }
+}
+
+.message.new {
+    animation: notifPulse 1s ease;
+}
