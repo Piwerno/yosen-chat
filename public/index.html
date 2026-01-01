@@ -3,33 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Yosen 💬</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="chat">
-    <h1>
-        Yosen 💬
-        <button id="mainMenuBtn">☰</button>
-    </h1>
+    <h1>Yosen 💬</h1>
 
-    <div id="mainMenu" class="main-menu">
-        <button onclick="supprimerTousMessages()">Supprimer tous les messages</button>
-        <button onclick="changerTheme()">Changer le thème</button>
-        <button onclick="afficherAide()">Aide</button>
-    </div>
+    <input id="pseudoInput" type="text" placeholder="Ton pseudo">
 
     <div id="messages"></div>
 
     <div class="input-zone">
         <input id="messageInput" type="text" placeholder="Ton message">
-        <input id="imageInput" type="file" accept="image/*" style="display:none">
-        <button onclick="document.getElementById('imageInput').click()">📷</button>
-        <button onclick="envoyerMessage()">Envoyer</button>
+        <button id="sendBtn" type="button">Envoyer</button>
     </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="script.js"></script>
+<script src="script.js" defer></script>
 </body>
 </html>
