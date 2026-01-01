@@ -1,4 +1,4 @@
-let pseudoUtilisateur = "";
+let pseudoUtilisateur = localStorage.getItem("pseudo") || "";
 const socket = io();
 
 const colors = {};
@@ -11,7 +11,7 @@ function getColor(pseudo) {
     return colors[pseudo];
 }
 
-function afficherMessage({ pseudo, texte, heure }) {
+function afficherMessage({ pseudo, texte, image, heure }) {
     const messages = document.getElementById("messages");
     const div = document.createElement("div");
     div.className = "message";
@@ -20,42 +20,67 @@ function afficherMessage({ pseudo, texte, heure }) {
         div.classList.add("droite");
     } else {
         div.classList.add("gauche");
-        div.style.background = getColor(pseudo);
+        if (!image) div.style.background = getColor(pseudo);
     }
 
-    div.innerHTML = `
-        <strong>${pseudo}</strong> <small>(${heure})</small><br>
-        ${texte}
-    `;
+    let content = `<strong>${pseudo}</strong> <small>(${heure})</small><br>`;
+    if (texte) content += texte;
+    if (image) content += `<br><img src="${image}" style="max-width:200px; border-radius:12px;">`;
 
+    div.innerHTML = content;
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
 }
 
 function envoyerMessage() {
-    const pseudo = document.getElementById("pseudoInput").value.trim();
-    const texte = document.getElementById("messageInput").value.trim();
-    if (!pseudo || !texte) return;
+    if (!pseudoUtilisateur) {
+        pseudoUtilisateur = prompt("Quel est ton pseudo ?") || "Invité";
+        localStorage.setItem("pseudo", pseudoUtilisateur);
+    }
 
-    pseudoUtilisateur = pseudo;
+    const texte = document.getElementById("messageInput").value.trim();
+    if (!texte) return;
 
     const now = new Date();
     const heure = now.getHours().toString().padStart(2, "0") + ":" +
                   now.getMinutes().toString().padStart(2, "0");
 
-    socket.emit("message", { pseudo, texte, heure });
+    socket.emit("message", { pseudo: pseudoUtilisateur, texte, image: null, heure });
     document.getElementById("messageInput").value = "";
 }
 
-socket.on("message", msg => {
-    afficherMessage(msg);
+// Envoi d'image
+const imageInput = document.getElementById("imageInput");
+imageInput.addEventListener("change", () => {
+    const file = imageInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        const now = new Date();
+        const heure = now.getHours().toString().padStart(2, "0") + ":" +
+                      now.getMinutes().toString().padStart(2, "0");
+
+        socket.emit("message", {
+            pseudo: pseudoUtilisateur,
+            texte: null,
+            image: reader.result,
+            heure
+        });
+    };
+    reader.readAsDataURL(file);
+    imageInput.value = "";
 });
 
+// Socket.io
+socket.on("message", msg => afficherMessage(msg));
+
+// Enter pour envoyer message
 document.getElementById("messageInput").addEventListener("keypress", e => {
     if (e.key === "Enter") envoyerMessage();
 });
 
-// Menu principal
+// Menu
 document.getElementById("mainMenuBtn").onclick = () => {
     const menu = document.getElementById("mainMenu");
     menu.style.display = menu.style.display === "flex" ? "none" : "flex";

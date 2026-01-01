@@ -23,80 +23,13 @@
 
     <div class="input-zone">
         <input id="messageInput" type="text" placeholder="Ton message">
+        <input id="imageInput" type="file" accept="image/*" style="display:none">
+        <button onclick="document.getElementById('imageInput').click()">📷</button>
         <button onclick="envoyerMessage()">Envoyer</button>
     </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script>
-const socket = io();
-
-// Vérifier si un pseudo est déjà enregistré
-let pseudoUtilisateur = localStorage.getItem("pseudoUtilisateur") || "";
-
-// Si pas encore de pseudo, demander une fois
-if (!pseudoUtilisateur) {
-    pseudoUtilisateur = prompt("Choisis ton pseudo :") || "Utilisateur" + Math.floor(Math.random()*1000);
-    localStorage.setItem("pseudoUtilisateur", pseudoUtilisateur);
-}
-
-// Couleurs pour pseudo
-const colors = {};
-const palette = ["#4f46e5", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6"];
-function getColor(pseudo) {
-    if (!colors[pseudo]) colors[pseudo] = palette[Math.floor(Math.random()*palette.length)];
-    return colors[pseudo];
-}
-
-// Affichage des messages
-function afficherMessage({ pseudo, texte, heure }) {
-    const messages = document.getElementById("messages");
-    const div = document.createElement("div");
-    div.className = "message";
-
-    if (pseudo === pseudoUtilisateur) {
-        div.classList.add("droite");
-    } else {
-        div.classList.add("gauche");
-        div.style.background = getColor(pseudo);
-    }
-
-    div.innerHTML = `<strong>${pseudo}</strong> <small>(${heure})</small><br>${texte}`;
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-}
-
-// Envoyer un message
-function envoyerMessage() {
-    const texte = document.getElementById("messageInput").value.trim();
-    if (!texte) return;
-
-    const now = new Date();
-    const heure = now.getHours().toString().padStart(2,"0") + ":" +
-                  now.getMinutes().toString().padStart(2,"0");
-
-    socket.emit("message", { pseudo: pseudoUtilisateur, texte, heure });
-    document.getElementById("messageInput").value = "";
-}
-
-// Recevoir messages
-socket.on("message", msg => afficherMessage(msg));
-
-// Envoyer avec Enter
-document.getElementById("messageInput").addEventListener("keypress", e => {
-    if (e.key === "Enter") envoyerMessage();
-});
-
-// Menu principal
-document.getElementById("mainMenuBtn").onclick = () => {
-    const menu = document.getElementById("mainMenu");
-    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
-};
-
-// Fonctions menu
-function supprimerTousMessages() { document.getElementById("messages").innerHTML = ""; }
-function changerTheme() { document.body.classList.toggle("dark"); }
-function afficherAide() { alert("💬 Chat temps réel Node.js\nCréé par toi 😎"); }
-</script>
+<script src="script.js"></script>
 </body>
 </html>
